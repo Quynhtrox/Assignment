@@ -1,1 +1,0 @@
-savedcmd_/home/troc/workplace/Assignments/02.Kernel_module/Assignment_1/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/troc/workplace/Assignments/02.Kernel_module/Assignment_1/Module.symvers -T /home/troc/workplace/Assignments/02.Kernel_module/Assignment_1/modules.order -i Module.symvers -e 

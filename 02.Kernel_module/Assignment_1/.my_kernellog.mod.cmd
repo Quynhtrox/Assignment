@@ -1,1 +1,0 @@
-savedcmd_/home/troc/workplace/Assignments/02.Kernel_module/Assignment_1/my_kernellog.mod := printf '%s\n'   my_kernellog.o | awk '!x[$$0]++ { print("/home/troc/workplace/Assignments/02.Kernel_module/Assignment_1/"$$0) }' > /home/troc/workplace/Assignments/02.Kernel_module/Assignment_1/my_kernellog.mod
