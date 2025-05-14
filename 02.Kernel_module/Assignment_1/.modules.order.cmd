@@ -1,0 +1,1 @@
+savedcmd_/home/troc/workplace/Assignments/02.Kernel_module/Assignment_1/modules.order := {   echo /home/troc/workplace/Assignments/02.Kernel_module/Assignment_1/my_kernellog.o; :; } > /home/troc/workplace/Assignments/02.Kernel_module/Assignment_1/modules.order
