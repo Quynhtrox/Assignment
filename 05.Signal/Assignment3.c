@@ -24,10 +24,11 @@ void handle_sig(int sig) {
 }
 
 int main() {
+    printf("PID: %d\n", getpid());
     sigset_t block_set;
 
     struct sigaction sa;
-    sa.sa_handler = handle_sigint;
+    sa.sa_handler = handle_sig;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
 

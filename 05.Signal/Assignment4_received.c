@@ -1,11 +1,14 @@
-#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
 #include <pthread.h>
 
-volatile sig_atomic_t shared_value = 0;
+#define handle_error(msg) \
+    do { perror("msg"); exit(EXIT_FAILURE);} while(0);
+
+volatile int shared_value = 0;
 
 void handle_sigusr1(int signo) {
     printf("Received SIGUSR1, shared_value = %d\n", shared_value);
@@ -25,7 +28,7 @@ void *pending_checker(void *arg) {
 
         sleep(1);
     }
-    return NULL;
+    pthread_exit(NULL);
 }
 
 int main() {
@@ -38,29 +41,36 @@ int main() {
     sa.sa_flags = 0;
     sigaction(SIGUSR1, &sa, NULL);
 
+    // Start pending-checker thread
+    // pthread_t tid;
+    // pthread_create(&tid, NULL, pending_checker, NULL);
+    // pthread_detach(tid);
+
     sleep(10);
 
     // Block SIGUSR1
-    sigset_t block_set, prev_mask;
+    sigset_t block_set;
     sigemptyset(&block_set);
     sigaddset(&block_set, SIGUSR1);
-    sigprocmask(SIG_BLOCK, &block_set, &prev_mask);
+    if (sigprocmask(SIG_BLOCK, &block_set, NULL) < 0)
+        handle_error("sigprocmask() - block\n");
+    printf("Blocking SIGUSR1 now.\n");
 
-    shared_value++;
-    // Start pending-checker thread
     pthread_t tid;
     pthread_create(&tid, NULL, pending_checker, NULL);
     pthread_detach(tid);
-    
+
     // Simulate critical work (while signal is blocked)
-    for (int i = 0; i < 10; i++) {
-        printf("Doing critical work...\n");
-        sleep(2);
+    printf("Doing critical work...\n");
+    for (int i = 0; i < 20; i++) {
+        shared_value++;
+        sleep(1);
     }
 
     // Restore previous mask = unblock SIGUSR1
-    printf("Unblocking SIGINT now.\n");
-    sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+    if (sigprocmask(SIG_UNBLOCK, &block_set, NULL) < 0)
+        handle_error("sigprocmask() - unblock\n");
+    printf("Unblocking SIGUSR1 now.\n");
 
     // Wait to receive signal
     while (1) {

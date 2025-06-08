@@ -22,10 +22,10 @@ void check_signal_mask() {
     }
 }
 
-void check_signal_var(sigset_t curr_mask) {
+void check_signal_var(sigset_t* set) {
     for (int i = 1; i < NSIG; i++) {
-        if (sigismember(&curr_mask, i)) {
-            printf("Signal %d is blocked\n", i);
+        if (sigismember(set, i)) {
+            printf("Signal %d is in the set\n", i);
         }
     }
 }
@@ -54,7 +54,7 @@ int main() {
         handle_error("sigprocmask() - block\n");
 
     printf("\nCheck block_set.\n");
-    check_signal_var(block_set);
+    check_signal_var(&block_set);
 
     printf("Blocked SIGINT, SIGTERM, and SIGQUIT for 10 seconds.\n");
 
