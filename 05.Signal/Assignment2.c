@@ -32,7 +32,7 @@ void check_signal_var(sigset_t* set) {
 
 int main() {
     printf("PID: %d\n", getpid());
-    sigset_t block_set, old_set;
+    sigset_t block_set;
 
     struct sigaction sa;
     sa.sa_handler = handle_sig;
@@ -50,7 +50,7 @@ int main() {
         sigaddset(&block_set, signals[i]);
     }
 
-    if (sigprocmask(SIG_BLOCK, &block_set, &old_set) < 0)
+    if (sigprocmask(SIG_BLOCK, &block_set, NULL) < 0)
         handle_error("sigprocmask() - block\n");
 
     printf("\nCheck block_set.\n");
