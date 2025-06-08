@@ -1,44 +1,72 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h>     //exit()
 #include <signal.h>
-#include <unistd.h>
+#include <unistd.h>     //sleep()
 
 #define handle_error(msg) \
     do { perror("msg"); exit(EXIT_FAILURE);} while(0);
 
-void handle_sigint(int sig) {
-    //printf("Received SIGINT!\n");
+void handle_sig(int sig) {
     printf("Received signal: %d\n", sig);
 }
 
+void check_signal_mask() {
+    sigset_t curr_mask;
+    sigemptyset(&curr_mask);
+    sigprocmask(0, NULL, &curr_mask);
+
+    for (int i = 1; i < NSIG; i++) {
+        if (sigismember(&curr_mask, i)) {
+            printf("Signal %d is blocked\n", i);
+        }
+    }
+}
+
+void check_signal_var(sigset_t curr_mask) {
+    for (int i = 1; i < NSIG; i++) {
+        if (sigismember(&curr_mask, i)) {
+            printf("Signal %d is blocked\n", i);
+        }
+    }
+}
+
 int main() {
+    printf("PID: %d\n", getpid());
     sigset_t block_set, old_set;
 
     struct sigaction sa;
-    sa.sa_handler = handle_sigint;
+    sa.sa_handler = handle_sig;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
 
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGTERM, &sa, NULL);
-    sigaction(SIGQUIT, &sa, NULL);
+    int signals[] = {SIGINT, SIGTERM, SIGQUIT};
+    for (int i = 0; i < sizeof(signals)/sizeof(signals[0]); i++) {
+        sigaction(signals[i], &sa, NULL);
+    }
 
     sigemptyset(&block_set);
-    sigaddset(&block_set, SIGINT);
-    sigaddset(&block_set, SIGTERM);
-    sigaddset(&block_set, SIGQUIT);
+
+    for (int i = 0; i < sizeof(signals)/sizeof(signals[0]); i++) {
+        sigaddset(&block_set, signals[i]);
+    }
 
     if (sigprocmask(SIG_BLOCK, &block_set, &old_set) < 0)
         handle_error("sigprocmask() - block\n");
 
+    printf("\nCheck block_set.\n");
+    check_signal_var(block_set);
+
     printf("Blocked SIGINT, SIGTERM, and SIGQUIT for 10 seconds.\n");
-    //printf("SIGINT is blocked for 10 seconds. Try press Ctrl+C now ...\n");
+
+    printf("\nCheck mash curent.\n");
+    check_signal_mask();
     sleep(10);
 
-    if (sigprocmask(SIG_SETMASK, &old_set, NULL) < 0)
+    if (sigprocmask(SIG_UNBLOCK, &block_set, NULL) < 0)
         handle_error("sigprocmask() - unblock\n");
 
-    printf("SIGINT is unblocked. Press Ctrl+C now to trigger handler.\n");
+    printf("SIGINT, SIGQUIT, SIGTERM is unblocked.\n");
+    check_signal_mask();
 
     while(1) {
         printf("working ...\n");

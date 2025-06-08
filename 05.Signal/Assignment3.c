@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h>     // eixt()
 #include <signal.h>
-#include <unistd.h>
+#include <unistd.h>     //sleep()
+#include <string.h>     //strsignal()
 
 #define handle_error(msg) \
     do { perror("msg"); exit(EXIT_FAILURE);} while(0);
@@ -13,33 +14,36 @@ void pending_signals() {
     printf("Pending signals:\n");
     for (int sig = 1; sig < NSIG; sig++) {
         if (sigismember(&pending, sig)) {
-            printf("Signal %d is pending\n", sig);
+            printf("Signal %2d: %s\n", sig, strsignal(sig));
         }
     }
 }
 
-void handle_sigint(int sig) {
+void handle_sig(int sig) {
     printf("Received signal: %d\n", sig);
 }
 
 int main() {
-    sigset_t block_set, old_set;
+    sigset_t block_set;
 
     struct sigaction sa;
     sa.sa_handler = handle_sigint;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
 
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGTERM, &sa, NULL);
-    sigaction(SIGQUIT, &sa, NULL);
+    int signals[] = {SIGINT, SIGTERM, SIGQUIT};
+    for (int i = 0; i < sizeof(signals)/sizeof(signals[0]); i++) {
+        sigaction(signals[i], &sa, NULL);
+    }
 
     sigemptyset(&block_set);
-    sigaddset(&block_set, SIGINT);
-    sigaddset(&block_set, SIGTERM);
-    sigaddset(&block_set, SIGQUIT);
 
-    if (sigprocmask(SIG_BLOCK, &block_set, &old_set) < 0)
+    for (int i = 0; i < sizeof(signals)/sizeof(signals[0]); i++) {
+        sigaddset(&block_set, signals[i]);
+    }
+
+
+    if (sigprocmask(SIG_BLOCK, &block_set, NULL) < 0)
         handle_error("sigprocmask() - block\n");
 
     printf("Blocked SIGINT, SIGTERM, and SIGQUIT for 30 seconds.\n");
@@ -47,10 +51,10 @@ int main() {
 
     pending_signals();
 
-    if (sigprocmask(SIG_SETMASK, &old_set, NULL) < 0)
+    if (sigprocmask(SIG_UNBLOCK, &block_set, NULL) < 0)
         handle_error("sigprocmask() - unblock\n");
 
-    printf("SIGINT is unblocked. Press Ctrl+C now to trigger handler.\n");
+    printf("SIGINT, SIGQUIT, SIGTERM is unblocked.\n");
 
     while(1) {
         printf("working ...\n");
