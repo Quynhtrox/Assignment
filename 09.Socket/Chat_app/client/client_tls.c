@@ -9,8 +9,6 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4433
 #define BUFFER_SIZE 2048
 
 SSL *ssl = NULL;
@@ -66,7 +64,14 @@ void *send_handler(void *arg) {
     return NULL;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <Server_IP> <port>\n", argv[0]);
+        return 1;
+    }
+
+    int port = atoi(argv[2]);
+
     signal(SIGINT, handle_exit);
 
     SSL_library_init();
@@ -79,7 +84,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    if (!SSL_CTX_load_verify_locations(ctx, "server.crt", NULL)) {
+    if (!SSL_CTX_load_verify_locations(ctx, "/home/troc/workplace/Assignments/09.Socket/Chat_app/server/server.crt", NULL)) {
         ERR_print_errors_fp(stderr);
         SSL_CTX_free(ctx);
         exit(EXIT_FAILURE);
@@ -88,8 +93,8 @@ int main() {
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(SERVER_PORT);
-    inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr);
+    server_addr.sin_port = htons(port);
+    inet_pton(AF_INET, argv[1], &server_addr.sin_addr);
 
     if (connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
         perror("Connect failed");
