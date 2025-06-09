@@ -17,10 +17,12 @@ volatile int running = 1;
 
 pthread_t recv_thread, send_thread;
 
+/* Clear '\r\n' */
 void trim_newline(char *str) {
     str[strcspn(str, "\r\n")] = '\0';
 }
 
+/* Close SSL & socket, clean data */
 void cleanup() {
     running = 0;
     if (ssl) SSL_shutdown(ssl);
@@ -29,11 +31,13 @@ void cleanup() {
     printf("\n[+] Disconnected from server\n");
 }
 
+/* Handle SIGINT */
 void handle_exit(int sig) {
     cleanup();
     exit(0);
 }
 
+/* Receive and handle messenger from server */
 void *receive_handler(void *arg) {
     char buffer[BUFFER_SIZE];
     while (running) {
@@ -47,6 +51,7 @@ void *receive_handler(void *arg) {
     return NULL;
 }
 
+/* Send messenger to server */
 void *send_handler(void *arg) {
     char buffer[BUFFER_SIZE];
     while (running && fgets(buffer, sizeof(buffer), stdin)) {

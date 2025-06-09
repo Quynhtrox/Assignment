@@ -24,23 +24,26 @@ void *handle_client(void *arg) {
     char password[64], hash[65];
     char option[16];
 
-    SSL_write(cli->ssl, "Choose: login / register\n", 26);
+    // Choose login/sign_up mode
+    SSL_write(cli->ssl, "Choose: log_in / sign_up\n", 26);
     len = SSL_read(cli->ssl, option, sizeof(option) - 1);
     if (len <= 0) goto cleanup;
     option[len] = '\0'; trim_newline(option);
 
+    // Enter username
     SSL_write(cli->ssl, "Username: ", 10);
     len = SSL_read(cli->ssl, cli->username, sizeof(cli->username) - 1);
     if (len <= 0) goto cleanup;
     cli->username[len] = '\0'; trim_newline(cli->username);
 
+    // Enter password 
     SSL_write(cli->ssl, "Password: ", 10);
     len = SSL_read(cli->ssl, password, sizeof(password) - 1);
     if (len <= 0) goto cleanup;
     password[len] = '\0'; trim_newline(password);
     hash_password(password, hash);
 
-    if (strcmp(option, "register") == 0) {
+    if (strcmp(option, "sign_up") == 0) {
         if (username_exists(cli->username)) {
             SSL_write(cli->ssl, "Username already exists\n", 24);
             goto cleanup;
@@ -51,13 +54,13 @@ void *handle_client(void *arg) {
             fprintf(fp, "%s:%s\n", cli->username, hash);
             fclose(fp);
             pthread_mutex_unlock(&storage_mutex);
-            SSL_write(cli->ssl, "Register successful\n", 20);
+            SSL_write(cli->ssl, "sign_up successful\n", 20);
         } else {
             pthread_mutex_unlock(&storage_mutex);
-            SSL_write(cli->ssl, "Register failed\n", 16);
+            SSL_write(cli->ssl, "sign_up failed\n", 16);
             goto cleanup;
         }
-    } else if (strcmp(option, "login") == 0) {
+    } else if (strcmp(option, "log_in") == 0) {
         pthread_mutex_lock(&storage_mutex);
         FILE *fp = fopen("storage_account.txt", "r");
         int found = 0;
@@ -74,10 +77,10 @@ void *handle_client(void *arg) {
         }
         pthread_mutex_unlock(&storage_mutex);
         if (!found) {
-            SSL_write(cli->ssl, "Login failed\n", 13);
+            SSL_write(cli->ssl, "log_in failed\n", 13);
             goto cleanup;
         }
-        SSL_write(cli->ssl, "Login successful\n", 17);
+        SSL_write(cli->ssl, "log_in successful\n", 17);
     } else {
         SSL_write(cli->ssl, "Invalid option\n", 15);
         goto cleanup;
@@ -120,6 +123,7 @@ void trim_newline(char *text) {
     text[strcspn(text, "\r\n")] = '\0';
 }
 
+/* Send messenger to all client */
 void broadcast_message(const char *message, client_t *sender) {
     pthread_mutex_lock(&clients_mutex);
     for (int i = 0; i < MAX_CLIENTS; i++) {
@@ -135,6 +139,7 @@ void broadcast_message(const char *message, client_t *sender) {
     }
 }
 
+/* Encrypt password with SHA-256, export in hex format */
 void hash_password(const char *password, char *output) {
     unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256((unsigned char *)password, strlen(password), hash);
@@ -144,6 +149,7 @@ void hash_password(const char *password, char *output) {
     output[64] = '\0';
 }
 
+/* Check if username exists in storage_account.txt file */
 int username_exists(const char *username) {
     pthread_mutex_lock(&storage_mutex);
     FILE *fp = fopen("storage_account.txt", "r");
@@ -165,6 +171,7 @@ int username_exists(const char *username) {
     return 0;
 }
 
+/* Handle SIGINT */
 void handle_sigint(int sig) {
     log_system("Server shutting down");
     printf("Signal %d: SIGINT\n", sig);

@@ -6,6 +6,7 @@
 #include "shared_data.h"
 #include "log.h"
 
+/* Save log activity server into chat.log */
 void log_system(const char *message) {
     pthread_mutex_lock(&log_mutex);
     FILE *log = fopen("chat.log", "a");
@@ -20,6 +21,7 @@ void log_system(const char *message) {
     pthread_mutex_unlock(&log_mutex);
 }
 
+/* Save log activity user into chat.log */
 void log_message(const char *username, const char *message) {
     pthread_mutex_lock(&log_mutex);
     FILE *log = fopen("chat.log", "a");
@@ -34,6 +36,7 @@ void log_message(const char *username, const char *message) {
     pthread_mutex_unlock(&log_mutex);
 }
 
+/* Save messenger to chat_history.txt */
 void save_to_history(const char *message) {
     FILE *fp = fopen("chat_history.txt", "a");
     if (fp) {
