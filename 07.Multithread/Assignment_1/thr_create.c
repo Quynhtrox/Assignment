@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -13,12 +12,6 @@ int main() {
 
     pthread_create(&thread1, NULL, thread_1, NULL);
     pthread_create(&thread2, NULL, thread_2, NULL);
-
-    if (pthread_equal(thread1, thread2)) {
-        printf("Thread 1 is the same thread 2\n");
-    } else {
-        printf("Thread 1 is NOT the same thread 2\n");
-    }
 
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);

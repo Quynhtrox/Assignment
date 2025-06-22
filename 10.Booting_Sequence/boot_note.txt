@@ -1,0 +1,23 @@
+Assignment1.
+
+[    0.586587] Memory: 3878180K/4193716K available (22528K kernel code, 4435K rwdata, 13952K rodata, 4988K init, 4728K bss, 315276K reserved, 0K cma-reserved)
+
+- Meaning: Kernel has been identified and system memory configured:
+    + Total RAM: 3.8Gb/4Gb available
+    + Kernel code
+    + rwdata
+    + rodata
+    + init
+    + bss
+    + reserved
+    + cma-reserved
+
+Assignment2.
+
+It defines how disks and partitions are automatically mounted during system booting.
+
+Assignment3.
+
+The "quiet" parameter reduces boot-time messages on screen for a cleaner startup.
+
+Ubuntu, with Linux 6.8.0-60-generic : Option to boot Ubuntu OS with kernel version 6.8.0-60-generic

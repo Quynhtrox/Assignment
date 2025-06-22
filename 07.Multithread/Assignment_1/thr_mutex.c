@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -7,7 +6,6 @@ pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 void* thread_1(void* args);
 void* thread_2(void* args);
-
 
 int main() {
     pthread_t tid, thread1, thread2;

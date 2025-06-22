@@ -65,7 +65,7 @@ void* thread_2(void* args) {
     }
     printf("Thread_2 running ...\n");
     pthread_mutex_unlock(&lock);
-    
+    printf("Thread_2 done!\n"); 
     return NULL;
 }
 
@@ -78,6 +78,6 @@ void* thread_3(void* args) {
     }
     printf("Thread_3 running ...\n");
     pthread_mutex_unlock(&lock);
-  
+    printf("Thread_3 done!\n");
     return NULL;
 }

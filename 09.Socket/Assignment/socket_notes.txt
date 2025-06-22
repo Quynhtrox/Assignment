@@ -1,0 +1,15 @@
+Assignment1.
+
+- Netid: network protocol (tcp)
+- State: socket status (LISTEN)
+- Local Address:Port	127.0.0.1:631
+
+Port 631 is typically used by the IPP (Internet printing protocol) for network printing services.
+
+
+Assignment3.
+
+- s: This is a socket
+- X1025 is socket used by X1025
+
+X1025 is likely for the X1025, which handles graphical display communication on Unix systems.

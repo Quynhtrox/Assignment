@@ -1,0 +1,1 @@
+cmd_/home/troc/workplace/Assignments/12.Device_tree/Module.symvers := sed 's/ko$$/o/' /home/troc/workplace/Assignments/12.Device_tree/modules.order | scripts/mod/modpost -m -a  -o /home/troc/workplace/Assignments/12.Device_tree/Module.symvers -e -i Module.symvers   -T -

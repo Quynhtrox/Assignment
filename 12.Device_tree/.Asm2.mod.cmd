@@ -1,0 +1,1 @@
+cmd_/home/troc/workplace/Assignments/12.Device_tree/Asm2.mod := printf '%s\n'   Asm2.o | awk '!x[$$0]++ { print("/home/troc/workplace/Assignments/12.Device_tree/"$$0) }' > /home/troc/workplace/Assignments/12.Device_tree/Asm2.mod
