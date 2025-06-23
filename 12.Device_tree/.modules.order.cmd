@@ -1,1 +1,0 @@
-cmd_/home/troc/workplace/Assignments/12.Device_tree/modules.order := {   echo /home/troc/workplace/Assignments/12.Device_tree/Asm1.ko;   echo /home/troc/workplace/Assignments/12.Device_tree/Asm2.ko; :; } | awk '!x[$$0]++' - > /home/troc/workplace/Assignments/12.Device_tree/modules.order
